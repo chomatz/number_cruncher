@@ -6,5 +6,7 @@ ansible role for system provisioning
 ## variables
 
 ## dependencies
+requires the following roles:
+- [boot_loader](https://github.com/chomatz/boot_loader)
 
 ## examples
