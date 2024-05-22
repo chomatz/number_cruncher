@@ -1,0 +1,24 @@
+---
+
+baseline_packages:
+  - bash-completion
+  - bind-utils
+  - ethtool
+  - firewalld
+  - grubby
+  - lm_sensors
+  - lsof
+  - net-tools
+  - pciutils
+  - rsync
+  - sos
+  - sysstat
+  - tar
+  - telnet
+  - tmux
+  - unzip
+  - usbutils
+  - wget
+  - which
+
+...
