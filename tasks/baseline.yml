@@ -43,6 +43,11 @@
         name: remote_management
         tasks_from: cockpit_deploy.yml
 
+    - name: deploy chrony
+      ansible.builtin.include_role:
+        name: time_synchronization
+        tasks_from: chrony_deploy.yml
+
   when: ansible_distribution == "Fedora"
 
 ...
