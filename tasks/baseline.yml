@@ -67,6 +67,19 @@
         var: services_disabled
         verbosity: 1
 
+    - name: "enable services {{ enabled_services }}"
+      ansible.builtin.command:
+        cmd: "systemctl enable --now {{ enabled_services | join(' ') }}"
+      register: services_enabled
+      failed_when:
+        - services_enabled is failed
+        - "'does not exist' not in services_enabled.stderr"
+
+    - name: display enabled services
+      ansible.builtin.debug:
+        var: services_enabled
+        verbosity: 1
+
   when: ansible_distribution == "Fedora"
 
 ...
