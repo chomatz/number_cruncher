@@ -53,6 +53,20 @@
         name: system_information
         tasks_from: fastfetch_deploy.yml
 
+    - name: "disable services {{ disabled_services }}"
+      ansible.builtin.command:
+        cmd: "systemctl disable --now {{ disabled_services | join(' ') }}"
+      register: services_disabled
+      failed_when:
+        - services_disabled is failed
+        - "'does not exist' not in services_disabled.stderr"
+        - "'not loaded' not in services_disabled.stderr"
+
+    - name: display disabled services
+      ansible.builtin.debug:
+        var: services_disabled
+        verbosity: 1
+
   when: ansible_distribution == "Fedora"
 
 ...
