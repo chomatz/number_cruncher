@@ -150,6 +150,14 @@
         group: root
         mode: "0644"
 
+    - name: deploy ssh customizations
+      ansible.builtin.template:
+        src: 99-ssh_custom.conf.j2
+        dest: /etc/ssh/ssh_config.d/99-ssh_custom.conf
+        owner: root
+        group: root
+        mode: "0644"
+
   when: ansible_distribution == "Fedora"
 
 ...
