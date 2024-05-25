@@ -4,6 +4,8 @@ ansible role for system provisioning
 ## requirements
 
 ## variables
+- fqdn_hostname: true
+  - set fqdn_hostname to false to set the hostname as the hostname part only
 
 ## dependencies
 requires the following roles:
