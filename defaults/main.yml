@@ -47,5 +47,9 @@ disabled_services:
   - sssd-kcm
   - switcheroo-control
   - systemd-oomd
+enabled_services:
+  - cockpit.socket
+  - firewalld
+  - sysstat
 
 ...
