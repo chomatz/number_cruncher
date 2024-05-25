@@ -90,6 +90,66 @@
         name: "{{ inventory_hostname_short }}"
       when: not fqdn_hostname
 
+    - name: get hostname
+      ansible.builtin.command:
+        cmd: hostname
+      changed_when: false
+      register: node_hostname
+
+    - name: generate fancy hostname
+      ansible.builtin.command:
+        cmd: figlet -w 256 -f small "{{ node_hostname.stdout }}"
+      changed_when: false
+      delegate_to: localhost
+      failed_when:
+        - figlet_hostname is failed
+        - "'No such file or directory' not in cmd_figlet_hostname.msg"
+      register: figlet_hostname
+
+    - name: display figlet result
+      ansible.builtin.debug:
+        var: figlet_hostname
+        verbosity: 1
+
+    - name: generate standard hostname
+      ansible.builtin.set_fact:
+        figlet_hostname:
+          stdout: "{{ node_hostname.stdout }}"
+      delegate_to: localhost
+      when: figlet_hostname.stdout == ""
+
+    - name: ensure /etc/motd.d exists
+      ansible.builtin.file:
+        path: /etc/motd.d
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: set hostname in /etc/motd.d/hostname
+      ansible.builtin.copy:
+        content: "{{ figlet_hostname.stdout }}"
+        dest: /etc/motd.d/hostname
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: ensure /etc/issue.d exists
+      ansible.builtin.file:
+        path: /etc/issue.d
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: set hostname in /etc/issue.d/hostname.issue
+      ansible.builtin.copy:
+        content: "{{ figlet_hostname.stdout }}"
+        dest: /etc/issue.d/hostname.issue
+        owner: root
+        group: root
+        mode: "0644"
+
   when: ansible_distribution == "Fedora"
 
 ...
