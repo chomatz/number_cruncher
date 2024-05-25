@@ -9,7 +9,7 @@ ansible role for system provisioning
 requires the following roles:
 - [boot_loader](https://github.com/chomatz/boot_loader)
 - [remote_management](https://github.com/chomatz/remote_management)
-- [system_information](git@github.com:chomatz/system_information.git)
+- [system_information](https://github.com/chomatz/system_information)
 - [time_synchronization](https://github.com/chomatz/time_synchronization)
 
 ## examples
