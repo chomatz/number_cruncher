@@ -51,5 +51,7 @@ enabled_services:
   - firewalld
   - sysstat
 fqdn_hostname: true
+ssh_max_timeouts: 2
+ssh_ping_interval: 60
 
 ...
