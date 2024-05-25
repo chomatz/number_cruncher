@@ -50,5 +50,6 @@ disabled_services:
 enabled_services:
   - firewalld
   - sysstat
+fqdn_hostname: true
 
 ...
