@@ -48,7 +48,6 @@ disabled_services:
   - switcheroo-control
   - systemd-oomd
 enabled_services:
-  - cockpit.socket
   - firewalld
   - sysstat
 
