@@ -1,0 +1,18 @@
+---
+
+- name: ensure tasks run only on selected os releases
+  block:
+
+    - name: deploy gnome desktop
+      ansible.builtin.include_role:
+        name: desktop_environment
+        tasks_from: gnome_desktop.yml
+
+    - name: deploy gnome tweaks
+      ansible.builtin.include_role:
+        name: desktop_environment
+        tasks_from: gnome_tweaks.yml
+
+  when: ansible_distribution == "Fedora"
+
+...
