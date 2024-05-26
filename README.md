@@ -8,7 +8,7 @@ ansible role for system provisioning
   - set fqdn_hostname to false to set the hostname as the hostname part only
 
 ## dependencies
-requires the following roles:
+requires the following role(s):
 - [boot_loader](https://github.com/chomatz/boot_loader)
 - [remote_management](https://github.com/chomatz/remote_management)
 - [system_information](https://github.com/chomatz/system_information)
