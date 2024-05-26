@@ -15,3 +15,17 @@ requires the following role(s):
 - [time_synchronization](https://github.com/chomatz/time_synchronization)
 
 ## examples
+```
+- name: deploy baseline configuration
+  ansible.builtin.include_role:
+    name: number_cruncher
+    tasks_from: baseline.yml
+  vars:
+    fqdn_hostname: false
+```
+```
+- name: deploy desktop environment
+  ansible.builtin.include_role:
+    name: number_cruncher
+    tasks_from: desktop.yml
+```
