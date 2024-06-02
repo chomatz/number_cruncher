@@ -6,6 +6,8 @@ ansible role for system provisioning
 ## variables
 - fqdn_hostname: true
   - set fqdn_hostname to false to set the hostname as the hostname part only
+- virtual_machines: list/string
+  - used by virt-sysprep to determine kvm domains to clean
 
 ## dependencies
 requires the following role(s):
