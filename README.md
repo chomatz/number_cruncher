@@ -29,3 +29,29 @@ requires the following role(s):
     name: number_cruncher
     tasks_from: desktop.yml
 ```
+```
+---
+- name: prepare virtual machine(s) for templating
+  hosts: "{{ nodes }}"
+  tasks:
+    - name: template preparation
+      ansible.builtin.include_role:
+        name: number_cruncher
+        tasks_from: kvm_template.yml
+    - name: assemble list of virtual machines
+      ansible.builtin.set_fact:
+        virtual_machines: "{{ ansible_play_hosts }}"
+      delegate_to: localhost
+      delegate_facts: true
+      run_once: true
+- name: cleanup virtual machine(s) for templating
+  hosts: "{{ hypervisor }}"
+  tasks:
+    - name: template cleanup
+      ansible.builtin.include_role:
+        name: number_cruncher
+        tasks_from: virt-sysprep.yml
+      vars:
+        virtual_machines: "{{ hostvars['localhost']['virtual_machines'] }}"
+...
+```
