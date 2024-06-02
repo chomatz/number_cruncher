@@ -1,0 +1,39 @@
+---
+
+- name: ensure tasks run only on selected os releases
+  block:
+
+    - name: deploy essential configuration
+      ansible.builtin.include_tasks:
+        file: essential.yml
+
+    - name: install provisioning packages
+      ansible.builtin.package:
+        name:
+          - acpid
+          - cloud-init
+          - cloud-utils-growpart
+        state: present
+
+    - name: enable acpid seervice
+      ansible.builtin.service:
+        name: acpid
+        state: started
+        enabled: true
+
+    - name: disable zeroconf route
+      ansible.builtin.lineinfile:
+        path: /etc/sysconfig/network
+        line: NOZEROCONF=yes
+        state: present
+        regexp: '^NOZEROCONF='
+
+    - name: execute pre shutdown tasks
+      meta: flush_handlers
+
+    - name: shutdown node
+      community.general.shutdown:
+
+  when: ansible_distribution == "Fedora"
+
+...
