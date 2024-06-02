@@ -1,0 +1,23 @@
+---
+
+- name: display virtual machine list
+  ansible.builtin.debug:
+    var: virtual_machines
+    verbosity: 1
+
+- name: ensure tasks run only on selected os releases
+  block:
+
+    - name: install templating tools
+      ansible.builtin.package:
+        name: guestfs-tools
+        state: present
+
+    - name: cleanup using virt-sysprep
+      ansible.builtin.command:
+        cmd: virt-sysprep -d "{{ item }}"
+      loop: "{{ virtual_machines }}"
+
+  when: ansible_distribution == "Fedora"
+
+...
