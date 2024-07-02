@@ -1,38 +1,43 @@
 ---
 
-- name: update installed packages
-  ansible.builtin.package:
-    name: "*"
-    state: latest
-  ignore_errors: true
+- name: ensure tasks run only on selected os releases
+  block:
 
-- name: install additional packages
-  ansible.builtin.package:
-    name: "{{ baseline_packages }}"
-    state: present
+    - name: update installed packages
+      ansible.builtin.package:
+        name: "*"
+        state: latest
+      ignore_errors: true
 
-- name: display grub menu
-  ansible.builtin.include_role:
-    name: boot_loader
-    tasks_from: grub_settings.yml
-  vars:
-    grub_settings:
-      - key: GRUB_HIDDEN_TIMEOUT
-        value: 0
-      - key: GRUB_TIMEOUT_STYLE
-        value: menu
-      - key: GRUB_TIMEOUT
-        value: 5
+    - name: install additional packages
+      ansible.builtin.package:
+        name: "{{ baseline_packages }}"
+        state: present
 
-- name: remove default kernel arguments
-  ansible.builtin.include_role:
-    name: boot_loader
-    tasks_from: kernel_arguments.yml
-  vars:
-    grubby_task: remove
-    kernel_arguments:
-      - crashkernel
-      - quiet
-      - rhgb
+    - name: display grub menu
+      ansible.builtin.include_role:
+        name: boot_loader
+        tasks_from: grub_settings.yml
+      vars:
+        grub_settings:
+          - key: GRUB_HIDDEN_TIMEOUT
+            value: 0
+          - key: GRUB_TIMEOUT_STYLE
+            value: menu
+          - key: GRUB_TIMEOUT
+            value: 5
+
+    - name: remove default kernel arguments
+      ansible.builtin.include_role:
+        name: boot_loader
+        tasks_from: kernel_arguments.yml
+      vars:
+        grubby_task: remove
+        kernel_arguments:
+          - crashkernel
+          - quiet
+          - rhgb
+
+  when: ansible_distribution == "Fedora"
 
 ...
