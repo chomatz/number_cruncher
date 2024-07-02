@@ -38,6 +38,17 @@
           - quiet
           - rhgb
 
+    - name: check if a reboot is required
+      ansible.builtin.command:
+        cmd: dnf needs-restarting -r
+      changed_when: reboot_needed.rc != 0
+      failed_when: false
+      notify: initiate reboot
+      register: reboot_needed
+      when:
+        - reboot is defined
+        - reboot
+
   when: ansible_distribution == "Fedora"
 
 ...
