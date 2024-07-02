@@ -3,6 +3,7 @@
 baseline_packages:
   - bash-completion
   - bind-utils
+  - dnf-utils
   - ethtool
   - firewalld
   - grubby
