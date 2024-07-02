@@ -3,51 +3,56 @@
 - name: ensure tasks run only on selected os releases
   block:
 
-    - name: deploy essential configuration
-      ansible.builtin.include_tasks:
-        file: essential.yml
+    - name: ensure tasks run only on selected os releases
+      block:
 
-    - name: deploy cockpit
-      ansible.builtin.include_role:
-        name: remote_management
-        tasks_from: cockpit_deploy.yml
+        - name: deploy essential configuration
+          ansible.builtin.include_tasks:
+            file: essential.yml
 
-    - name: deploy chrony
-      ansible.builtin.include_role:
-        name: time_synchronization
-        tasks_from: chrony_deploy.yml
+        - name: "disable services {{ disabled_services }}"
+          ansible.builtin.command:
+            cmd: "systemctl disable --now {{ disabled_services | join(' ') }}"
+          register: services_disabled
+          failed_when:
+            - services_disabled is failed
+            - "'does not exist' not in services_disabled.stderr"
+            - "'not loaded' not in services_disabled.stderr"
+
+        - name: display disabled services
+          ansible.builtin.debug:
+            var: services_disabled
+            verbosity: 1
+
+        - name: "enable services {{ enabled_services }}"
+          ansible.builtin.command:
+            cmd: "systemctl enable --now {{ enabled_services | join(' ') }}"
+          register: services_enabled
+          failed_when:
+            - services_enabled is failed
+            - "'does not exist' not in services_enabled.stderr"
+
+        - name: display enabled services
+          ansible.builtin.debug:
+            var: services_enabled
+            verbosity: 1
+
+        - name: deploy cockpit
+          ansible.builtin.include_role:
+            name: remote_management
+            tasks_from: cockpit_deploy.yml
+
+        - name: deploy chrony
+          ansible.builtin.include_role:
+            name: time_synchronization
+            tasks_from: chrony_deploy.yml
+
+      when: ansible_distribution == "Fedora"
 
     - name: deploy fastfetch
       ansible.builtin.include_role:
         name: system_information
         tasks_from: fastfetch_deploy.yml
-
-    - name: "disable services {{ disabled_services }}"
-      ansible.builtin.command:
-        cmd: "systemctl disable --now {{ disabled_services | join(' ') }}"
-      register: services_disabled
-      failed_when:
-        - services_disabled is failed
-        - "'does not exist' not in services_disabled.stderr"
-        - "'not loaded' not in services_disabled.stderr"
-
-    - name: display disabled services
-      ansible.builtin.debug:
-        var: services_disabled
-        verbosity: 1
-
-    - name: "enable services {{ enabled_services }}"
-      ansible.builtin.command:
-        cmd: "systemctl enable --now {{ enabled_services | join(' ') }}"
-      register: services_enabled
-      failed_when:
-        - services_enabled is failed
-        - "'does not exist' not in services_enabled.stderr"
-
-    - name: display enabled services
-      ansible.builtin.debug:
-        var: services_enabled
-        verbosity: 1
 
     - name: set hostname
       ansible.builtin.hostname:
@@ -127,6 +132,8 @@
         group: root
         mode: "0644"
 
-  when: ansible_distribution == "Fedora"
+  when: >
+    (ansible_distribution == "Archlinux" and ansible_distribution_release == "holo") or
+    ansible_distribution == "Fedora"
 
 ...
