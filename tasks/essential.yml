@@ -38,13 +38,22 @@
           - quiet
           - rhgb
 
-    - name: check if a reboot is required
-      ansible.builtin.command:
-        cmd: dnf needs-restarting -r
-      changed_when: reboot_needed.rc != 0
-      failed_when: false
-      notify: initiate reboot
-      register: reboot_needed
+    - name: reboot system if required
+      block:
+
+      - name: check if a reboot is required
+        ansible.builtin.command:
+          cmd: dnf needs-restarting -r
+        changed_when: reboot_needed.rc != 0
+        failed_when: false
+        notify: initiate reboot
+        register: reboot_needed
+
+      - name: display reboot flag
+        ansible.builtin.debug:
+          var: reboot_needed
+          verbosity: 1
+
       when:
         - reboot is defined
         - reboot
