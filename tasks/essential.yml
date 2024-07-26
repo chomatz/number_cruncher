@@ -38,6 +38,9 @@
           - quiet
           - rhgb
 
+    - name: execute handlers
+      meta: flush_handlers
+
     - name: reboot system if required
       block:
 
