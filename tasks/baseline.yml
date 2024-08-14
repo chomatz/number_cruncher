@@ -47,7 +47,9 @@
             name: time_synchronization
             tasks_from: chrony_deploy.yml
 
-      when: ansible_distribution == "Fedora"
+      when: >
+        ansible_distribution == "Fedora" or
+        ansible_distribution == "Rocky"
 
     - name: deploy fastfetch
       ansible.builtin.include_role:
@@ -134,6 +136,7 @@
 
   when: >
     (ansible_distribution == "Archlinux" and ansible_distribution_release == "holo") or
-    ansible_distribution == "Fedora"
+    ansible_distribution == "Fedora" or
+    ansible_distribution == "Rocky"
 
 ...

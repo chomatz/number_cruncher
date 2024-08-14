@@ -61,6 +61,8 @@
         - reboot is defined
         - reboot
 
-  when: ansible_distribution == "Fedora"
+  when: >
+    ansible_distribution == "Fedora" or
+    ansible_distribution == "Rocky"
 
 ...
