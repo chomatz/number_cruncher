@@ -30,6 +30,8 @@
       when:
         - battery_threshold.results.0.stat.exists
         - battery_threshold.results.1.stat.exists
+        - min_charge_threshold is defined
+        - max_charge_threshold is defined
 
   when: >
     (ansible_distribution == "Archlinux" and ansible_distribution_release == "holo") or
