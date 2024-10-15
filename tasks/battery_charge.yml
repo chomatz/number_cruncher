@@ -1,0 +1,37 @@
+---
+
+- name: ensure tasks run only on selected os releases
+  block:
+
+    - name: check for battery charging threshold customization support
+      ansible.builtin.stat:
+        path: "/sys/class/power_supply/BAT0/charge_control_{{ item }}_threshold"
+      register: battery_threshold
+      loop:
+        - start
+        - end
+
+    - name: display battery threshold results
+      ansible.builtin.debug:
+        var: battery_threshold
+        verbosity: 1
+
+    - name: enable battery charge threshold customizations
+      block:
+
+        - name: set battery charge start threshold
+          ansible.builtin.shell:
+            cmd: "echo {{ min_charge_threshold }} > /sys/class/power_supply/BAT0/charge_control_start_threshold"
+
+        - name: set battery charge end threshold
+          ansible.builtin.shell:
+            cmd: "echo {{ max_charge_threshold }} > /sys/class/power_supply/BAT0/charge_control_end_threshold"
+
+      when:
+        - battery_threshold.results.0.stat.exists
+        - battery_threshold.results.1.stat.exists
+
+  when: >
+    (ansible_distribution == "Archlinux" and ansible_distribution_release == "holo") or
+    ansible_distribution == "Fedora" or
+    ansible_distribution == "Rocky"
