@@ -15,7 +15,7 @@
           - cloud-utils-growpart
         state: present
 
-    - name: enable acpid seervice
+    - name: enable acpid service
       ansible.builtin.service:
         name: acpid
         state: started
