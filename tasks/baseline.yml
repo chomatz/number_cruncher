@@ -134,6 +134,10 @@
         group: root
         mode: "0644"
 
+    - name: deploy battery charging optimizations
+      ansible.builtin.include_tasks:
+        file: battery_charge.yml
+
   when: >
     (ansible_distribution == "Archlinux" and ansible_distribution_release == "holo") or
     ansible_distribution == "Fedora" or
