@@ -3,6 +3,33 @@
 - name: ensure tasks run only on selected os releases
   block:
 
+    - name: install python3-libdnf
+      block:
+
+        - name: install python3-libdnf5
+          ansible.builtin.command:
+            cmd: dnf install -y python3-libdnf5
+          register: python_dnf
+          changed_when: "'already installed' not in python_dnf.stderr"
+
+        - name: display python3-libdnf5 install result
+          ansible.builtin.debug:
+            var: python_dnf
+            verbosity: 1
+
+      rescue:
+
+        - name: install python3-libdnf
+          ansible.builtin.command:
+            cmd: dnf install -y python3-libdnf
+          register: python_dnf
+          changed_when: "'already installed' not in python_dnf.stderr"
+
+        - name: display python3-libdnf install result
+          ansible.builtin.debug:
+            var: python_dnf
+            verbosity: 1
+
     - name: update installed packages
       ansible.builtin.package:
         name: "*"
