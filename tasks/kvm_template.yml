@@ -7,7 +7,7 @@
       ansible.builtin.include_tasks:
         file: essential.yml
 
-    - name: install provisioning packages
+    - name: install virtualization-related packages
       ansible.builtin.package:
         name:
           - acpid
