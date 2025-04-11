@@ -105,7 +105,10 @@
 
     - name: set hostname in /etc/motd.d/hostname
       ansible.builtin.copy:
-        content: "{{ figlet_hostname.stdout }}"
+        content: |
+          
+          {{ figlet_hostname.stdout }}
+          
         dest: /etc/motd.d/hostname
         owner: root
         group: root
@@ -121,7 +124,10 @@
 
     - name: set hostname in /etc/issue.d/hostname.issue
       ansible.builtin.copy:
-        content: "{{ figlet_hostname.stdout }}"
+        content: |
+          
+          {{ figlet_hostname.stdout }}
+          
         dest: /etc/issue.d/hostname.issue
         owner: root
         group: root
