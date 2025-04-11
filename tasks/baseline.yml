@@ -75,7 +75,7 @@
 
     - name: generate fancy hostname
       ansible.builtin.command:
-        cmd: figlet -w 256 -f small "{{ node_hostname.stdout }}"
+        cmd: "figlet -w 256 -f {{ figlet_font }} {{ node_hostname.stdout }}"
       changed_when: false
       delegate_to: localhost
       failed_when:
@@ -106,7 +106,6 @@
     - name: set hostname in /etc/motd.d/hostname
       ansible.builtin.copy:
         content: |
-          
           {{ figlet_hostname.stdout }}
           
         dest: /etc/motd.d/hostname
@@ -125,7 +124,6 @@
     - name: set hostname in /etc/issue.d/hostname.issue
       ansible.builtin.copy:
         content: |
-          
           {{ figlet_hostname.stdout }}
           
         dest: /etc/issue.d/hostname.issue
