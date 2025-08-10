@@ -3,7 +3,7 @@
 - name: ensure tasks run only on selected os releases
   block:
 
-    - name: install python3-libdnf
+    - name: install python3-libdnf(5)
       block:
 
         - name: install python3-libdnf5
