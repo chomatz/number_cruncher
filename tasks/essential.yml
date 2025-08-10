@@ -30,16 +30,49 @@
             var: python_dnf
             verbosity: 1
 
-    - name: update installed packages
-      ansible.builtin.package:
-        name: "*"
-        state: latest
-      ignore_errors: true
+      when: os_id.stdout != "bazzite"
 
-    - name: install additional packages
-      ansible.builtin.package:
-        name: "{{ baseline_packages }}"
-        state: present
+    - name: package updates
+      block:
+
+        - name: update installed packages using root
+          ansible.builtin.shell:
+            cmd: "$(which topgrade) --config {{ ansible_work_dir.path }}/topgrade_root.toml --skip-notify"
+          register: ujust_update_root
+
+        - name: display ujust root output
+          ansible.builtin.debug:
+            var: ujust_update_root.stdout
+            verbosity: 1
+
+        - name: "update installed packages using {{ ansible_user }}"
+          ansible.builtin.shell:
+            cmd: "$(which topgrade) --config {{ ansible_work_dir.path }}/topgrade_user.toml --skip-notify"
+          register: ujust_update_user
+          vars:
+            ansible_become: false
+
+        - name: display ujust user output
+          ansible.builtin.debug:
+            var: ujust_update_user.stdout
+            verbosity: 1
+
+      when: os_id.stdout == "bazzite"
+
+    - name: package updates
+      block:
+
+        - name: update installed packages
+          ansible.builtin.package:
+            name: "*"
+            state: latest
+
+        - name: install additional packages
+          ansible.builtin.package:
+            name: "{{ baseline_packages }}"
+            state: present
+
+      when: os_id.stdout != "bazzite"
 
     - name: display grub menu
       ansible.builtin.include_role:
@@ -92,5 +125,9 @@
     ansible_distribution == "Fedora" or
     ansible_distribution == "RedHat" or
     ansible_distribution == "Rocky"
+
+- ansible.builtin.debug:
+    msg: exiting
+  failed_when: true
 
 ...
