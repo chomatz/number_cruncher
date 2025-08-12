@@ -126,8 +126,4 @@
     ansible_distribution == "RedHat" or
     ansible_distribution == "Rocky"
 
-- ansible.builtin.debug:
-    msg: exiting
-  failed_when: true
-
 ...
