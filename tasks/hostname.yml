@@ -1,0 +1,81 @@
+---
+
+- name: set hostname
+  ansible.builtin.hostname:
+    name: "{{ inventory_hostname }}"
+
+- name: define decorative hostname
+  ansible.builtin.set_fact:
+    node_hostname: "{{ inventory_hostname }}"
+  when: fqdn_hostname
+
+- name: define decorative hostname
+  ansible.builtin.set_fact:
+    node_hostname: "{{ inventory_hostname_short }}"
+  when: not fqdn_hostname
+
+- name: set decorative hostname when possible
+  block:
+
+    - name: generate fancy hostname
+      ansible.builtin.shell:
+        cmd: "figlet -w 256 -f {{ figlet_font }} {{ node_hostname }} | sed -e 's/ *$//g' -e '/^$/d'"
+      changed_when: false
+      register: figlet_hostname
+
+    - name: display figlet result
+      ansible.builtin.debug:
+        msg: |
+          -----
+          {{ figlet_hostname.stdout }}
+          -----
+        verbosity: 1
+
+  rescue:
+
+    - name: generate standard hostname
+      ansible.builtin.set_fact:
+        figlet_hostname:
+          stdout: "{{ node_hostname }}"
+      when: figlet_hostname.stdout == ""
+
+    - name: display figlet result
+      ansible.builtin.debug:
+        var: figlet_hostname.stdout
+        verbosity: 1
+
+  delegate_to: localhost
+
+- name: ensure /etc/motd.d exists
+  ansible.builtin.file:
+    path: /etc/motd.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: set hostname in /etc/motd.d/hostname
+  ansible.builtin.copy:
+    content: "\n{{ figlet_hostname.stdout }}\n\n"
+    dest: /etc/motd.d/hostname
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: ensure /etc/issue.d exists
+  ansible.builtin.file:
+    path: /etc/issue.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: set hostname in /etc/issue.d/hostname.issue
+  ansible.builtin.copy:
+    content: "\n{{ figlet_hostname.stdout }}\n\n"
+    dest: /etc/issue.d/hostname.issue
+    owner: root
+    group: root
+    mode: "0644"
+
+...
