@@ -149,10 +149,10 @@
         file: battery_charge.yml
 
   when: >
-    (ansible_distribution == "Archlinux" and ansible_distribution_release == "holo") or
     os_id.stdout == "bazzite" or
     os_id.stdout == "fedora" or
     os_id.stdout == "rhel" or
-    os_id.stdout == "rocky"
+    os_id.stdout == "rocky" or
+    os_id.stdout == "steamos"
 
 ...
