@@ -3,12 +3,12 @@
 - name: ensure tasks run only on selected os releases
   block:
 
+    - name: deploy essential configuration
+      ansible.builtin.include_tasks:
+        file: essential.yml
+
     - name: ensure tasks run only on selected os releases
       block:
-
-        - name: deploy essential configuration
-          ansible.builtin.include_tasks:
-            file: essential.yml
 
         - name: "disable services {{ disabled_services }}"
           ansible.builtin.command:
@@ -48,14 +48,15 @@
             tasks_from: chrony_deploy.yml
 
       when: >
-        ansible_distribution == "Fedora" or
-        ansible_distribution == "RedHat" or
-        ansible_distribution == "Rocky"
+        os_id.stdout == "fedora" or
+        os_id.stdout == "rhel" or
+        os_id.stdout == "rocky"
 
     - name: deploy fastfetch
       ansible.builtin.include_role:
         name: system_information
         tasks_from: fastfetch_deploy.yml
+      when: os_id.stdout != "bazzite"
 
     - name: set hostname
       ansible.builtin.hostname:
@@ -87,6 +88,7 @@
       ansible.builtin.debug:
         var: figlet_hostname
         verbosity: 1
+      delegate_to: localhost
 
     - name: generate standard hostname
       ansible.builtin.set_fact:
@@ -94,6 +96,12 @@
           stdout: "{{ node_hostname.stdout }}"
       delegate_to: localhost
       when: figlet_hostname.stdout == ""
+
+    - name: display figlet result
+      ansible.builtin.debug:
+        var: figlet_hostname
+        verbosity: 1
+      delegate_to: localhost
 
     - name: ensure /etc/motd.d exists
       ansible.builtin.file:
@@ -145,8 +153,9 @@
 
   when: >
     (ansible_distribution == "Archlinux" and ansible_distribution_release == "holo") or
-    ansible_distribution == "Fedora" or
-    ansible_distribution == "RedHat" or
-    ansible_distribution == "Rocky"
+    os_id.stdout == "bazzite" or
+    os_id.stdout == "fedora" or
+    os_id.stdout == "rhel" or
+    os_id.stdout == "rocky"
 
 ...
