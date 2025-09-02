@@ -3,37 +3,78 @@
 - name: ensure tasks run only on selected os releases
   block:
 
-    - name: check for battery charging threshold customization support
-      ansible.builtin.stat:
-        path: "/sys/class/power_supply/BAT0/charge_control_{{ item }}_threshold"
-      register: battery_threshold
-      loop:
-        - start
-        - end
+    - name: check for battery charging threshold support - option 1
+      ansible.builtin.find:
+        path: /sys/class/power_supply
+        patterns: "charge_control_*_threshold"
+        file_type: file
+        depth: 2
+        follow: true
+        recurse: true
+      register: battery_threshold_1
 
-    - name: display battery threshold results
+    - name: display battery threshold support - option 1
       ansible.builtin.debug:
-        var: battery_threshold
+        var: battery_threshold_1
         verbosity: 1
 
-    - name: enable battery charge threshold customizations
+    - name: check for battery charging threshold support - option 2
+      ansible.builtin.find:
+        path: /sys/class/hwmon
+        patterns: max_battery_charge_level
+        file_type: file
+        depth: 2
+        follow: true
+        recurse: true
+      register: battery_threshold_2
+
+    - name: display battery threshold support - option 2
+      ansible.builtin.debug:
+        var: battery_threshold_2
+        verbosity: 1
+
+    - name: enable battery threshold customizations - option 1
       block:
 
-        - name: set battery charge start threshold
+        - name: enable battery threshold customizations - option 1
           ansible.builtin.shell:
-            cmd: "echo {{ min_charge_threshold }} > /sys/class/power_supply/BAT0/charge_control_start_threshold"
+            cmd: "echo {{ min_charge_threshold }} > {{ item.path }}"
+          when: "'_start_' in item.path"
+          loop: "{{ battery_threshold_1.files }}"
+          loop_control:
+            label: "{{ item.path }}"
 
-        - name: set battery charge end threshold
+        - name: enable battery threshold customizations - option 1
           ansible.builtin.shell:
-            cmd: "echo {{ max_charge_threshold }} > /sys/class/power_supply/BAT0/charge_control_end_threshold"
+            cmd: "echo {{ max_charge_threshold }} > {{ item.path }}"
+          when: "'_end_' in item.path"
+          loop: "{{ battery_threshold_1.files }}"
+          loop_control:
+            label: "{{ item.path }}"
 
       when:
-        - battery_threshold.results.0.stat.exists
-        - battery_threshold.results.1.stat.exists
+        - battery_threshold_1.matched > 0
+        - min_charge_threshold is defined
+        - max_charge_threshold is defined
+
+    - name: enable battery threshold customizations - option 2
+      block:
+
+        - name: enable battery threshold customizations - option 2
+          ansible.builtin.shell:
+            cmd: "echo {{ max_charge_threshold }} > {{ item.path }}"
+          loop: "{{ battery_threshold_2.files }}"
+          loop_control:
+            label: "{{ item.path }}"
+
+      when:
+        - battery_threshold_2.matched > 0
         - min_charge_threshold is defined
         - max_charge_threshold is defined
 
   when: >
-    (ansible_distribution == "Archlinux" and ansible_distribution_release == "holo") or
-    ansible_distribution == "Fedora" or
-    ansible_distribution == "Rocky"
+    os_id.stdout == "bazzite" or
+    os_id.stdout == "fedora" or
+    os_id.stdout == "rhel" or
+    os_id.stdout == "rocky" or
+    os_id.stdout == "steamos"
