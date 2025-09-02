@@ -61,46 +61,47 @@
     - name: set hostname
       ansible.builtin.hostname:
         name: "{{ inventory_hostname }}"
+
+    - name: define decorative hostname
+      ansible.builtin.set_fact:
+        node_hostname: "{{ inventory_hostname }}"
       when: fqdn_hostname
 
-    - name: set hostname
-      ansible.builtin.hostname:
-        name: "{{ inventory_hostname_short }}"
+    - name: define decorative hostname
+      ansible.builtin.set_fact:
+        node_hostname: "{{ inventory_hostname_short }}"
       when: not fqdn_hostname
 
-    - name: get hostname
-      ansible.builtin.command:
-        cmd: hostnamectl hostname
-      changed_when: false
-      register: node_hostname
+    - name: set decorative hostname when possible
+      block:
 
-    - name: generate fancy hostname
-      ansible.builtin.command:
-        cmd: "figlet -w 256 -f {{ figlet_font }} {{ node_hostname.stdout }}"
-      changed_when: false
-      delegate_to: localhost
-      failed_when:
-        - figlet_hostname is failed
-        - "'No such file or directory' not in cmd_figlet_hostname.msg"
-      register: figlet_hostname
+        - name: generate fancy hostname
+          ansible.builtin.shell:
+            cmd: "figlet -w 256 -f {{ figlet_font }} {{ node_hostname }} | sed -e 's/ *$//g' -e '/^$/d'"
+          changed_when: false
+          register: figlet_hostname
 
-    - name: display figlet result
-      ansible.builtin.debug:
-        var: figlet_hostname
-        verbosity: 1
-      delegate_to: localhost
+        - name: display figlet result
+          ansible.builtin.debug:
+            msg: |
+              -----
+              {{ figlet_hostname.stdout }}
+              -----
+            verbosity: 1
 
-    - name: generate standard hostname
-      ansible.builtin.set_fact:
-        figlet_hostname:
-          stdout: "{{ node_hostname.stdout }}"
-      delegate_to: localhost
-      when: figlet_hostname.stdout == ""
+      rescue:
 
-    - name: display figlet result
-      ansible.builtin.debug:
-        var: figlet_hostname
-        verbosity: 1
+        - name: generate standard hostname
+          ansible.builtin.set_fact:
+            figlet_hostname:
+              stdout: "{{ node_hostname }}"
+          when: figlet_hostname.stdout == ""
+
+        - name: display figlet result
+          ansible.builtin.debug:
+            var: figlet_hostname.stdout
+            verbosity: 1
+
       delegate_to: localhost
 
     - name: ensure /etc/motd.d exists
@@ -113,9 +114,7 @@
 
     - name: set hostname in /etc/motd.d/hostname
       ansible.builtin.copy:
-        content: |
-          {{ figlet_hostname.stdout }}
-          
+        content: "\n{{ figlet_hostname.stdout }}\n\n"
         dest: /etc/motd.d/hostname
         owner: root
         group: root
@@ -131,9 +130,7 @@
 
     - name: set hostname in /etc/issue.d/hostname.issue
       ansible.builtin.copy:
-        content: |
-          {{ figlet_hostname.stdout }}
-          
+        content: "\n{{ figlet_hostname.stdout }}\n\n"
         dest: /etc/issue.d/hostname.issue
         owner: root
         group: root
