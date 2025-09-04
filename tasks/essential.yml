@@ -122,8 +122,9 @@
         - reboot
 
   when: >
-    ansible_distribution == "Fedora" or
-    ansible_distribution == "RedHat" or
-    ansible_distribution == "Rocky"
+    os_id.stdout == "bazzite" or
+    os_id.stdout == "fedora" or
+    os_id.stdout == "rhel" or
+    os_id.stdout == "rocky"
 
 ...
