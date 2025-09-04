@@ -13,6 +13,6 @@
         name: desktop_environment
         tasks_from: gnome_tweaks.yml
 
-  when: ansible_distribution == "Fedora"
+  when: os_id.stdout == "fedora"
 
 ...
