@@ -30,7 +30,7 @@
             var: python_dnf
             verbosity: 1
 
-      when: os_id.stdout != "bazzite"
+      when: ansible_distribution != "Bazzite"
 
     - name: package updates
       block:
@@ -57,7 +57,7 @@
             var: ujust_update_user.stdout
             verbosity: 1
 
-      when: os_id.stdout == "bazzite"
+      when: ansible_distribution == "Bazzite"
 
     - name: package updates
       block:
@@ -72,7 +72,7 @@
             name: "{{ baseline_packages }}"
             state: present
 
-      when: os_id.stdout != "bazzite"
+      when: ansible_distribution != "Bazzite"
 
     - name: display grub menu
       ansible.builtin.include_role:
@@ -122,9 +122,9 @@
         - reboot
 
   when: >
-    os_id.stdout == "bazzite" or
-    os_id.stdout == "fedora" or
-    os_id.stdout == "rhel" or
-    os_id.stdout == "rocky"
+    ansible_distribution == "Bazzite" or
+    ansible_distribution == "Fedora" or
+    ansible_distribution == "RedHat" or
+    ansible_distribution == "Rocky"
 
 ...

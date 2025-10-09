@@ -48,15 +48,15 @@
             tasks_from: chrony_deploy.yml
 
       when: >
-        os_id.stdout == "fedora" or
-        os_id.stdout == "rhel" or
-        os_id.stdout == "rocky"
+        ansible_distribution == "Fedora" or
+        ansible_distribution == "RedHat" or
+        ansible_distribution == "Rocky"
 
     - name: deploy fastfetch
       ansible.builtin.include_role:
         name: system_information
         tasks_from: fastfetch_deploy.yml
-      when: os_id.stdout != "bazzite"
+      when: ansible_distribution != "Bazzite"
 
     - name: deploy hostname customizations
       ansible.builtin.include_tasks:
@@ -75,10 +75,10 @@
         file: battery_charge.yml
 
   when: >
-    os_id.stdout == "bazzite" or
-    os_id.stdout == "fedora" or
-    os_id.stdout == "rhel" or
-    os_id.stdout == "rocky" or
-    os_id.stdout == "steamos"
+    (ansible_distribution == "Archlinux" and ansible_distribution_release == "holo") or
+    ansible_distribution == "Bazzite" or
+    ansible_distribution == "Fedora" or
+    ansible_distribution == "RedHat" or
+    ansible_distribution == "Rocky"
 
 ...
