@@ -32,7 +32,7 @@
 
       when: ansible_distribution != "Bazzite"
 
-    - name: package updates
+    - name: package updates for immutable systems
       block:
 
         - name: update installed packages using root
@@ -59,7 +59,7 @@
 
       when: ansible_distribution == "Bazzite"
 
-    - name: package updates
+    - name: package updates for non-immutable systems
       block:
 
         - name: update installed packages
