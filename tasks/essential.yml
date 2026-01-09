@@ -98,6 +98,10 @@
           - quiet
           - rhgb
 
+    - name: "unset menu_auto_hide" # bazzite hack to display the grub menu
+      ansible.builtin.command:
+        cmd: "grub2-editenv - unset menu_auto_hide"
+
     - name: execute handlers
       meta: flush_handlers
 
