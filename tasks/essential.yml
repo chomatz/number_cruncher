@@ -37,7 +37,7 @@
 
         - name: update installed packages using root
           ansible.builtin.shell:
-            cmd: "$(which topgrade) --config {{ ansible_work_dir.path }}/topgrade_root.toml --skip-notify"
+            cmd: "$(which topgrade) --allow-root --config {{ ansible_work_dir.path }}/topgrade_root.toml --skip-notify"
           register: ujust_update_root
 
         - name: display ujust root output
