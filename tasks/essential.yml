@@ -32,7 +32,7 @@
 
       when: ansible_distribution != "Bazzite"
 
-    - name: package updates for immutable systems
+    - name: package updates for immutable systems (bazzite <= 43)
       block:
 
         - name: "error handling for the --allow-root command flag"
@@ -67,7 +67,26 @@
             var: ujust_update_user.stdout
             verbosity: 1
 
-      when: ansible_distribution == "Bazzite"
+      when:
+        - ansible_distribution == "Bazzite"
+        - ansible_distribution_major_version | int() <= 43
+
+    - name: package updates for immutable systems (bazzite >= 44)
+      block:
+
+        - name: update installed packages
+          ansible.builtin.shell:
+            cmd: "$(which ujust) update" 
+          register: ujust_update
+
+        - name: display ujust output
+          ansible.builtin.debug:
+            var: ujust_update.stdout
+            verbosity: 1
+
+      when:
+        - ansible_distribution == "Bazzite"
+        - ansible_distribution_major_version | int() >= 44
 
     - name: package updates for non-immutable systems
       block:
