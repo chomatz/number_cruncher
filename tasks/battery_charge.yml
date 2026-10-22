@@ -52,6 +52,24 @@
           loop_control:
             label: "{{ item.path }}"
 
+      rescue:
+
+        - name: enable battery max threshold customizations - option 1
+          ansible.builtin.shell:
+            cmd: "echo {{ max_charge_threshold }} > {{ item.path }}"
+          when: "'_end_' in item.path"
+          loop: "{{ battery_threshold_1.files }}"
+          loop_control:
+            label: "{{ item.path }}"
+
+        - name: enable battery min threshold customizations - option 1
+          ansible.builtin.shell:
+            cmd: "echo {{ min_charge_threshold }} > {{ item.path }}"
+          when: "'_start_' in item.path"
+          loop: "{{ battery_threshold_1.files }}"
+          loop_control:
+            label: "{{ item.path }}"
+
       when:
         - battery_threshold_1.matched > 0
         - min_charge_threshold is defined
