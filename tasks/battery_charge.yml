@@ -36,7 +36,7 @@
     - name: enable battery threshold customizations - option 1
       block:
 
-        - name: enable battery threshold customizations - option 1
+        - name: enable battery min threshold customizations - option 1
           ansible.builtin.shell:
             cmd: "echo {{ min_charge_threshold }} > {{ item.path }}"
           when: "'_start_' in item.path"
@@ -44,7 +44,7 @@
           loop_control:
             label: "{{ item.path }}"
 
-        - name: enable battery threshold customizations - option 1
+        - name: enable battery max threshold customizations - option 1
           ansible.builtin.shell:
             cmd: "echo {{ max_charge_threshold }} > {{ item.path }}"
           when: "'_end_' in item.path"
@@ -57,7 +57,7 @@
         - min_charge_threshold is defined
         - max_charge_threshold is defined
 
-    - name: enable battery threshold customizations - option 2
+    - name: enable battery max threshold customizations - option 2
       block:
 
         - name: enable battery threshold customizations - option 2
